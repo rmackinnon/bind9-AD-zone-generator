@@ -153,7 +153,7 @@ Add each site individually in independent dictionaries within the array.  Here a
 ```
 
 #### Additional Options
-- create-zones: This value should be set to inject zone directly into the bind configuration.  It is not required to generate zone files.
+- create-zones: This value should be set to inject zone directly into the bind configuration.  Set to 'true' to generate zone files.
 ```
     "options": {
         "create-zones": false
