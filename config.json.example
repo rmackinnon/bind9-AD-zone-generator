@@ -1,0 +1,67 @@
+{
+    // bind-pri-records: Directory entry for all BIND records
+    "bind-pri-records": "/etc/bind/pri/",
+
+    // Kerberos Realm Information
+    "realm": "realm",
+    "realm-tld": "tld",
+
+    // domain-guid: Optional pre-defined domain GUID. If not defined, a random GUID will be assigned.
+    //"domain-guid": "00000000-0000-0000-00000000",
+
+    // Define individual domain controllers
+    "domain-controllers": [
+        {
+          // Set to DC FQDN
+          "fqdn": "tinderbox.thevillage.local",
+          // Set to DC static IP
+          "ip": "192.168.1.99"
+          // dsaGuid: Optional DsaGuid definition. If not defined, a random GUID will be assigned.
+          // "dsaGuid": ""
+        }
+    ],
+    // global-catalog-location: Defines which entry should be set as the GC server
+    "global-catalog-location": 0,
+
+    // Define the FQDNs of your KDCs and secondary KDCs
+    "kerberos-kdc": [
+        {"fqdn": "tinderbox.thevillage.local"}
+    ],
+    // primary-kdc: Defines which kerberos-kdc record is the primary KDC
+    "primary-kdc": 0,
+
+    // Define individual sites, assigning the domain controllers and matching kerberos servers to each
+    "sites": [
+        {
+          // name: MSDN denotes the valid character set for this field as: [a-zA-Z0-9-.]
+          // See the following URL for limitation: https://support.microsoft.com/en-us/kb/909264
+          "name": "Default-First-Site-Name",
+          // pdc: Index number of domain PDC
+          "pdc": 0,
+
+          // domain-controllers: Array of indexes of all site DCs
+          "domain-controllers": [0],
+
+          // kerberos-servers: Array of indexes of all site KDCs
+          "kerberos-servers": [0]
+        }
+    ],
+
+    // Define all the defaults for the each zone's SOA
+    "soa": {
+        // ns: set to the FQDN of the name server
+        "ns": "ns.realm.tld",
+        "admin": "root.realm.tld",
+        "default-refresh": 3600,
+        "default-retry": 600,
+        "default-expires": 86400,
+        "default-min-ttl": 3600,
+        // serial: Set the serial number for all records
+        "serial": 1
+    },
+
+    "options": {
+        // create-zones: Inject zone entries in the BIND configuration
+        "create-zones": false
+    }
+}
