@@ -59,7 +59,7 @@ Assign all the SOA defaults in this section.  The following keys are required:
 - default-expires: Default record expiration rate
 - default-min-ttl: Default record TTL rate
 
-Optional keys:
+Optional Keys:
 - serial: Set the serial number for all records.
 ```
     "soa": {
@@ -158,15 +158,17 @@ Add each site individually in independent dictionaries within the array.  Here a
     "options": {
         "create-zones": false
     }
+```
 
 That's it.
 
 ```
 }
 ```
+
 ## Command Line Usage
 
-generate-ad-zones.py <config.json>
+> generate-ad-zones.py \<config.json\>
 
 ## Future TODO
 
