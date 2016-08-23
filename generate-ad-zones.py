@@ -136,7 +136,7 @@ def createPath(path):
 
 
 def createBindConf(zone, fileName):
-    return 'zone "%s" in (\n' \
+    return 'zone "%s" in {\n' \
            '   type master;\n' \
            '   file "%s";\n' \
            '};\n' % (zone, fileName)
