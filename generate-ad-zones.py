@@ -435,10 +435,11 @@ def createDNSRecords(config=None):
     print(createBindConf(_zone, _filePath+"/root.zone"))
 
     print "//*._tcp.*._sites.gc._msdcs.%s\n" % REALM
+    _record = ""
     for dc in config["domain-controllers"]:
         _record += "%s\n" % return_NS_records(dc["fqdn"])
 
-    _record = '%s\n' \
+    _record += '%s\n' \
               '%s\n' % (return_SRV_records(389, GC_FQDN, '_ldap'),
                         return_SRV_records(88, KRB_MASTER, '_kerberos'))
 
