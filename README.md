@@ -89,7 +89,7 @@ Each dictionary entry should contain the following keys:
 - fqdn: The FQDN of the defined KDC/Secondardy KDC
 ```
     "kerberos-kdc": [
-        {"fqdn": "tinderbox.thevillage.local"}
+        {"fqdn": "dc.realm.local"}
     ],
 ```
 ###### Setting A Primary KDC
