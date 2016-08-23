@@ -73,7 +73,7 @@ def return_SOA_record(soa_dict, apexZone=None):
     if apexZone is None:
         apexZone = "@"
     else:
-        apexZone = "$ORIGIN %s\n@"
+        apexZone = "$ORIGIN %s\n@" % apexZone
 
     return "$TTL %d\n%s\tIN\tSOA\t%s. %s. (\n" \
            "\t\t\t\t\t\t\t\t%d\t; serial number\n" \
