@@ -74,7 +74,7 @@ def return_SOA_record(soa_dict):
            "\t\t\t\t\t\t\t\t%d\t; refresh\n" \
            "\t\t\t\t\t\t\t\t%d\t; retry\n" \
            "\t\t\t\t\t\t\t\t%d\t; expire\n" \
-           "\t\t\t\t\t\t\t\t%d )\t; min TTL\n" % (soa_dict["ns"], soa_dict["admin"],
+           "\t\t\t\t\t\t\t\t%d\t; min TTL\n)\n\n" % (soa_dict["ns"], soa_dict["admin"],
                                                   _serial, soa_dict["default-refresh"], soa_dict["default-retry"],
                                                   soa_dict["default-expires"], soa_dict["default-min-ttl"])
 
@@ -95,8 +95,10 @@ def return_SRV_records(port, fqdn, hostname=None):
 
 
 def return_NS_records(host_ip, hostname=None):
+    if hostname is None:
+        hostname = "@"
     return return_record('NS', 0, 2, host_ip, hostname)
-    # return "\t\tIN\tNS\t\t%s" % (host_ip)
+    # return "host\t\tIN\tNS\t\t%s" % (host_ip)
 
 
 def return_A_records(host_ip, hostname=None):
@@ -110,7 +112,7 @@ def return_TXT_records(txt, hostname=None):
 
 
 def return_CNAME_records(cname, hostname=None):
-    return return_record('CNAME', 0, 2, cname, hostname)
+    return return_record('CNAME', 0, 2, cname+".", hostname)
     # return "\t\tIN\tCNAME\t%s" % (cname)
 
 
@@ -216,6 +218,8 @@ def createDNSRecords(config=None):
     print "//*._tcp.%s\n" % REALM
     _record = ""
     for dc in config["domain-controllers"]:
+        _record += "%s\n" % return_NS_records(dc["fqdn"])
+    for dc in config["domain-controllers"]:
         _record +='%s\n' % return_SRV_records(389, dc["fqdn"], '_ldap')
 
     for kdc in config["kerberos-kdc"]:
@@ -240,6 +244,9 @@ def createDNSRecords(config=None):
     #${TLD}/${REALM_BASE}/_udp/root.zone
     print "//*._udp.%s\n" % REALM
     _record = ""
+    for dc in config["domain-controllers"]:
+        _record += "%s\n" % return_NS_records(dc["fqdn"])
+
     for dc in config["domain-controllers"]:
         _record += '%s\n' % return_SRV_records(389, dc["fqdn"], '_ldap')
 
@@ -268,6 +275,11 @@ def createDNSRecords(config=None):
     for _site in config["sites"]:
         print "//*.%s._sites.%s\n" % (_site["name"], REALM)
         _site_gc = config["domain-controllers"][_site["pdc"]]["fqdn"]
+
+        for dc in _site["domain-controllers"]:
+            dcRecord = config["domain-controllers"][dc]
+            _record += "%s\n" % return_NS_records(dcRecord["fqdn"])
+
         for dc in _site["domain-controllers"]:
             dcRecord = config["domain-controllers"][dc]
             _record +='%s\n' % return_SRV_records(389, dcRecord["fqdn"], '_ldap')
@@ -294,13 +306,15 @@ def createDNSRecords(config=None):
     print "//*._msdcs.%s\n" % REALM
     _record = ""
     for dc in config["domain-controllers"]:
+        _record += "%s\n" % return_NS_records(dc["fqdn"])
+
+    for dc in config["domain-controllers"]:
         # dsaGuid          IN A ip
         if "dsaGuid" not in dc:
             _fqdn = str(dc["fqdn"])
             _dsaGuid = str(uuid5(NAMESPACE_DNS, _fqdn))
         else:
             _dsaGuid = dc["dsaGuid"]
-        _record += "%s\n" % return_NS_records(dc["ip"])
         _record += "%s\n" % return_CNAME_records(_dsaGuid, dc["fqdn"])
     _filePath = config["bind-pri-records"]+"/".join((config["realm-tld"], config["realm"], "_msdcs"))
     if CREATE_ZONE_RECORDS:
@@ -329,6 +343,8 @@ def createDNSRecords(config=None):
     print "//*.dc._msdcs.%s\n" % REALM
     _record = ""
     for dc in config["domain-controllers"]:
+        _record += "%s\n" % return_NS_records(dc["fqdn"])
+    for dc in config["domain-controllers"]:
         _record += '%s\n' % return_SRV_records(389, dc["fqdn"], '_ldap')
     for kdc in config["kerberos-kdc"]:
         _record += '%s\n' % (return_SRV_records(88, kdc["fqdn"], '_kerberos'))
@@ -355,6 +371,10 @@ def createDNSRecords(config=None):
 
     for _site in config["sites"]:
         print "//%s._sites.dc._msdcs.%s\n" % (_site["name"], REALM)
+        for dc in _site["domain-controllers"]:
+            dcRecord = config["domain-controllers"][dc]
+            _record += "%s\n" % return_NS_records(dcRecord["fqdn"])
+
         for dc in _site["domain-controllers"]:
             dcRecord = config["domain-controllers"][dc]
             _record += "%s\n" % return_SRV_records(389, dcRecord["fqdn"], '_ldap')
@@ -391,6 +411,9 @@ def createDNSRecords(config=None):
     print(createBindConf(_zone, _filePath+"/root.zone"))
 
     print "//*._tcp.gc._msdcs.%s\n" % REALM
+    for dc in config["domain-controllers"]:
+        _record += "%s\n" % return_NS_records(dc["fqdn"])
+
     _record = '%s\n' % return_SRV_records(389, GC_FQDN, '_ldap')
     _filePath = config["bind-pri-records"]+"/".join((config["realm-tld"], config["realm"], "_msdcs", "gc", "_tcp"))
     if CREATE_ZONE_RECORDS:
@@ -402,6 +425,9 @@ def createDNSRecords(config=None):
     print(createBindConf(_zone, _filePath+"/root.zone"))
 
     print "//*._tcp.*._sites.gc._msdcs.%s\n" % REALM
+    for dc in config["domain-controllers"]:
+        _record += "%s\n" % return_NS_records(dc["fqdn"])
+
     _record = '%s\n' \
               '%s\n' % (return_SRV_records(389, GC_FQDN, '_ldap'),
                         return_SRV_records(88, KRB_MASTER, '_kerberos'))
@@ -426,7 +452,11 @@ def createDNSRecords(config=None):
 
     #${TLD}/${REALM_BASE}/_msdcs/domains/root.zone
     print "//*._tcp.%s.domains._msdcs.%s\n" % (DOMAIN_GUID,REALM)
-    _record = "%s\n" % return_SRV_records(389, GC_FQDN, '_ldap')
+    _record = ""
+    for dc in config["domain-controllers"]:
+        _record += "%s\n" % return_NS_records(dc["fqdn"])
+
+    _record += "%s\n" % return_SRV_records(389, GC_FQDN, '_ldap')
     _filePath = config["bind-pri-records"]+"/".join((config["realm-tld"],config["realm"],"_msdcs","domains"))
     if not createPath(_filePath):
         exit(100)
