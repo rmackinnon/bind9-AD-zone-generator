@@ -377,6 +377,7 @@ def createDNSRecords(config=None):
 
     for _site in config["sites"]:
         print "//%s._sites.dc._msdcs.%s\n" % (_site["name"], REALM)
+        _record = ""
         for dc in _site["domain-controllers"]:
             dcRecord = config["domain-controllers"][dc]
             _record += "%s\n" % return_NS_records(dcRecord["fqdn"])
@@ -406,21 +407,24 @@ def createDNSRecords(config=None):
 
     #${TLD}/${REALM_BASE}/_msdcs/gc/root.zone
     print "//*.gc._msdcs.%s\n" % REALM
-    _record = '%s\n' % return_A_records(GC_IP)
+    _record = ""
+    for dc in config["domain-controllers"]:
+        _record += "%s\n" % return_NS_records(dc["fqdn"])
+    _record += '%s\n' % return_A_records(GC_IP)
     _filePath = config["bind-pri-records"]+"/".join((config["realm-tld"], config["realm"], "_msdcs", "gc"))
     if CREATE_ZONE_RECORDS:
         if not createPath(_filePath):
             exit(100)
         if not writeZoneRecord(SOA, _filePath, _record):
             exit(101)
-    _zone = ".".join(("gc", "_msdsc", REALM))
+    _zone = ".".join(("gc", "_msdcs", REALM))
     print(createBindConf(_zone, _filePath+"/root.zone"))
 
     print "//*._tcp.gc._msdcs.%s\n" % REALM
+    _record = ""
     for dc in config["domain-controllers"]:
         _record += "%s\n" % return_NS_records(dc["fqdn"])
-
-    _record = '%s\n' % return_SRV_records(389, GC_FQDN, '_ldap')
+    _record += '%s\n' % return_SRV_records(389, GC_FQDN, '_ldap')
     _filePath = config["bind-pri-records"]+"/".join((config["realm-tld"], config["realm"], "_msdcs", "gc", "_tcp"))
     if CREATE_ZONE_RECORDS:
         if not createPath(_filePath):
