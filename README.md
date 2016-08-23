@@ -59,7 +59,7 @@ Assign all the SOA defaults in this section.  The following keys are required:
 - default-expires: Default record expiration rate
 - default-min-ttl: Default record TTL rate
 
-Optional Keys:
+Optional keys:
 - serial: Set the serial number for all records.
 ```
     "soa": {
@@ -122,7 +122,7 @@ Optional Keys:
     "domain-controllers": [
         {
           "fqdn": "dc.realm.local",
-          "ip": "192.168.1.99"
+          "ip": "192.168.0.1"
         }
     ],
 ```
@@ -153,22 +153,20 @@ Add each site individually in independent dictionaries within the array.  Here a
 ```
 
 #### Additional Options
-- create-zones: This value should be set to inject zone directly into the bind configuration.  Set to 'true' to generate zone files.
+- create-zones: This value should be set to inject zone directly into the bind configuration.  It is not required to generate zone files.
 ```
     "options": {
         "create-zones": false
     }
-```
 
 That's it.
 
 ```
 }
 ```
-
 ## Command Line Usage
 
-> generate-ad-zones.py \<config.json\>
+generate-ad-zones.py <config.json>
 
 ## Future TODO
 
