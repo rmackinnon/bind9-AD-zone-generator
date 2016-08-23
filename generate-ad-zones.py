@@ -97,7 +97,7 @@ def return_SRV_records(port, fqdn, hostname=None):
 def return_NS_records(host_ip, hostname=None):
     if hostname is None:
         hostname = "@"
-    return return_record('NS', 0, 2, host_ip, hostname)
+    return return_record('NS', 0, 2, host_ip+".", hostname)
     # return "host\t\tIN\tNS\t\t%s" % (host_ip)
 
 
