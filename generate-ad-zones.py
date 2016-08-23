@@ -90,7 +90,7 @@ def return_record(recordType, preTabs, postTabs, record, hostname=None):
 
 
 def return_SRV_records(port, fqdn, hostname=None):
-    return return_record('SRV', 0, 1, "0 0 %d\t%s" % (port, fqdn), hostname)
+    return return_record('SRV', 0, 1, "0 0 %d\t%s." % (port, fqdn), hostname)
     # return "\t\t\t\t\t\tIN\tSRV\t0 0 %d\t%s" % (port, fqdn)
 
 
