@@ -64,17 +64,23 @@ _ldap._tcp.${DOMAIN_GUID}				IN	SRV 0 0 389		${PDC_HOST_FQDN[0]};
 """
 
 
-def return_SOA_record(soa_dict):
+def return_SOA_record(soa_dict, apexZone=None):
     if not "serial-number" in soa_dict:
         _serial = 1
     else:
         _serial = soa_dict["serial"]
-    return "@\tIN\tSOA\t%s. %s. (\n" \
+
+    if apexZone is None:
+        apexZone = "@"
+    else:
+        apexZone = "$ORIGIN %s\n@"
+
+    return "$TTL %d\n%s\tIN\tSOA\t%s. %s. (\n" \
            "\t\t\t\t\t\t\t\t%d\t; serial number\n" \
            "\t\t\t\t\t\t\t\t%d\t; refresh\n" \
            "\t\t\t\t\t\t\t\t%d\t; retry\n" \
            "\t\t\t\t\t\t\t\t%d\t; expire\n" \
-           "\t\t\t\t\t\t\t\t%d\t; min TTL\n)\n\n" % (soa_dict["ns"], soa_dict["admin"],
+           "\t\t\t\t\t\t\t\t%d\t; min TTL\n)\n\n" % (soa_dict["default-min-ttl"], apexZone, soa_dict["ns"], soa_dict["admin"],
                                                   _serial, soa_dict["default-refresh"], soa_dict["default-retry"],
                                                   soa_dict["default-expires"], soa_dict["default-min-ttl"])
 
@@ -95,8 +101,8 @@ def return_SRV_records(port, fqdn, hostname=None):
 
 
 def return_NS_records(host_ip, hostname=None):
-    if hostname is None:
-        hostname = "@"
+    # if hostname is None:
+    #     hostname = "@"
     return return_record('NS', 0, 2, host_ip+".", hostname)
     # return "host\t\tIN\tNS\t\t%s" % (host_ip)
 
@@ -187,7 +193,7 @@ def createDNSRecords(config=None):
     GC_LOC = config["sites"][config["global-catalog-location"]]["name"]
     KRB_MASTER = config["kerberos-kdc"][config["primary-kdc"]]["fqdn"]
 
-    SOA = return_SOA_record(config["soa"])
+    SOA = return_SOA_record(config["soa"], REALM)
 
     CREATE_ZONE_RECORDS = config['options']['create-zones']
 
