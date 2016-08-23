@@ -193,7 +193,7 @@ def createDNSRecords(config=None):
     GC_LOC = config["sites"][config["global-catalog-location"]]["name"]
     KRB_MASTER = config["kerberos-kdc"][config["primary-kdc"]]["fqdn"]
 
-    SOA = return_SOA_record(config["soa"], REALM)
+    SOA = return_SOA_record(config["soa"])
 
     CREATE_ZONE_RECORDS = config['options']['create-zones']
 
