@@ -13,7 +13,7 @@
     "domain-controllers": [
         {
           // Set to DC FQDN
-          "fqdn": "tinderbox.thevillage.local",
+          "fqdn": "dc.realm.tld",
           // Set to DC static IP
           "ip": "192.168.1.99"
           // dsaGuid: Optional DsaGuid definition. If not defined, a random GUID will be assigned.
@@ -25,7 +25,7 @@
 
     // Define the FQDNs of your KDCs and secondary KDCs
     "kerberos-kdc": [
-        {"fqdn": "tinderbox.thevillage.local"}
+        {"fqdn": "dc.realm.tld"}
     ],
     // primary-kdc: Defines which kerberos-kdc record is the primary KDC
     "primary-kdc": 0,
